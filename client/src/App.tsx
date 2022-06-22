@@ -31,6 +31,7 @@ const [todos, { refetch }] = createResource<Todo[]>(() =>
 
 const App: Component = () => {
   const [text, setText] = createSignal('');
+
   const onAdd = async () => {
     await client
       .mutation(
@@ -51,12 +52,30 @@ const App: Component = () => {
     setText('');
   };
 
+  const toggle = async (id: string) => {
+    await client
+      .mutation(
+        `
+      mutation($id: ID!) {
+        toggleTodo(id: $id) {
+          id
+        }
+      }
+      `,
+        {
+          id,
+        }
+      )
+      .toPromise();
+    refetch();
+  };
+
   return (
     <div>
       <For each={todos()}>
         {({ id, done, text }) => (
           <div>
-            <input type="checkbox" checked={done} />
+            <input type="checkbox" checked={done} onclick={() => toggle(id)} />
             <span>{text}</span>
           </div>
         )}

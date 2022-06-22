@@ -19,7 +19,7 @@ const typeDefs = `
 	}
 	type Mutation {
 		addTodo(text: String!): Todo
-		setDone(id: ID!, done: Boolean!): Todo
+		toggleTodo(id: ID!): Todo
 	}
 `;
 
@@ -37,12 +37,12 @@ const resolvers = {
       todos.push(newTodo);
       return newTodo;
     },
-    setDone: (_: unknown, { id, done }: { id: string; done: boolean }) => {
+    toggleTodo: (_: unknown, { id }: { id: string }) => {
       const todo = todos.find(todo => todo.id === id);
       if (!todo) {
         throw new Error('Todo not found');
       }
-      todo.done = done;
+      todo.done = !todo.done;
       return todo;
     },
   },
