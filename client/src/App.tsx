@@ -12,7 +12,7 @@ interface Todo {
   done: boolean;
 }
 
-const [todos] = createResource<Todo[]>(() =>
+const [todos, { refetch }] = createResource<Todo[]>(() =>
   client
     .query(
       `
@@ -31,7 +31,23 @@ const [todos] = createResource<Todo[]>(() =>
 
 const App: Component = () => {
   const [text, setText] = createSignal('');
-  const onAdd = () => {
+  const onAdd = async () => {
+    await client
+      .mutation(
+        `
+    mutation($text: String!) {
+      addTodo(text: $text) {
+        id
+      }
+    }
+    `,
+        {
+          text: text(),
+        }
+      )
+      .toPromise();
+    refetch();
+
     setText('');
   };
 
